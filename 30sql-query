@@ -1,0 +1,302 @@
+-- Q1
+-- Count the total number of employees in the company.
+SELECT COUNT(*) AS total_employees
+FROM employee;
+
+
+-- Q2
+-- Calculate the total salary expense of all employees.
+SELECT SUM(salary) AS total_salary_expense
+FROM employee;
+
+
+-- Q3
+-- Calculate the average salary of all employees.
+SELECT AVG(salary) AS average_salary
+FROM employee;
+
+
+-- Q4
+-- Find the highest salary among all employees.
+SELECT MAX(salary) AS highest_salary
+FROM employee;
+
+
+-- Q5
+-- Find the lowest salary among all employees.
+SELECT MIN(salary) AS lowest_salary
+FROM employee;
+
+
+-- Q6
+-- Find employees whose salary is greater than 70,000.
+SELECT first_name, last_name, salary
+FROM employee
+WHERE salary > 70000;
+
+
+-- Q7
+-- Find employees whose salary is between 50,000 and 80,000.
+SELECT first_name, last_name, salary
+FROM employee
+WHERE salary BETWEEN 50000 AND 80000;
+
+
+-- Q8
+-- Find employees whose first name starts with the letter A.
+SELECT first_name, last_name
+FROM employee
+WHERE first_name LIKE 'A%';
+
+
+-- Q9
+-- Find the highest-paid employee in the company.
+SELECT *
+FROM employee
+ORDER BY salary DESC
+LIMIT 1;
+
+
+-- Q10
+-- Find the top 5 highest-paid employees.
+SELECT first_name, last_name, salary
+FROM employee
+ORDER BY salary DESC
+LIMIT 5;
+
+
+-- Q11
+-- Find employees whose salary is above the company average.
+SELECT first_name, last_name, salary
+FROM employee
+WHERE salary > (
+    SELECT AVG(salary)
+    FROM employee
+)
+ORDER BY salary DESC;
+
+
+-- Q12
+-- Count the number of employees in each department.
+SELECT department_id, COUNT(*) AS employee_count
+FROM employee
+GROUP BY department_id;
+
+
+-- Q13
+-- Calculate the total salary expense for each department.
+SELECT department_id, SUM(salary) AS total_salary
+FROM employee
+GROUP BY department_id;
+
+
+-- Q14
+-- Calculate the average salary for each department.
+SELECT department_id, AVG(salary) AS average_salary
+FROM employee
+GROUP BY department_id;
+
+
+-- Q15
+-- Find the highest salary in each department.
+SELECT department_id, MAX(salary) AS highest_salary
+FROM employee
+GROUP BY department_id;
+
+
+-- Q16
+-- Find the lowest salary in each department.
+SELECT department_id, MIN(salary) AS lowest_salary
+FROM employee
+GROUP BY department_id;
+
+
+-- Q17
+-- Find departments having more than 4 employees.
+SELECT
+    d.department_name,
+    COUNT(e.employee_id) AS employee_count
+FROM department d
+JOIN employee e
+    ON d.department_id = e.department_id
+GROUP BY d.department_id, d.department_name
+HAVING COUNT(e.employee_id) > 4;
+
+
+-- Q18
+-- Find departments where the average salary is above 60,000.
+SELECT
+    d.department_name,
+    ROUND(AVG(e.salary), 2) AS average_salary
+FROM department d
+JOIN employee e
+    ON d.department_id = e.department_id
+GROUP BY d.department_id, d.department_name
+HAVING AVG(e.salary) > 60000;
+
+
+-- Q19
+-- Find the total payroll of each department.
+SELECT
+    d.department_name,
+    SUM(e.salary) AS total_payroll
+FROM department d
+JOIN employee e
+    ON d.department_id = e.department_id
+GROUP BY d.department_id, d.department_name
+ORDER BY total_payroll DESC;
+
+
+-- Q20
+-- Show each employee along with their department and designation.
+SELECT
+    e.first_name || ' ' || e.last_name AS employee_name,
+    d.department_name,
+    ds.designation_name,
+    e.salary
+FROM employee e
+JOIN department d
+    ON e.department_id = d.department_id
+JOIN designation ds
+    ON e.designation_id = ds.designation_id;
+
+
+-- Q21
+-- Find all employees working as Software Engineers.
+SELECT
+    e.first_name || ' ' || e.last_name AS employee_name,
+    d.department_name,
+    e.salary
+FROM employee e
+JOIN designation ds
+    ON e.designation_id = ds.designation_id
+JOIN department d
+    ON e.department_id = d.department_id
+WHERE ds.designation_name = 'Software Engineer';
+
+
+-- Q22
+-- Find all employees working in the Finance department.
+SELECT
+    e.first_name,
+    e.last_name,
+    ds.designation_name,
+    e.salary
+FROM employee e
+JOIN department d
+    ON e.department_id = d.department_id
+JOIN designation ds
+    ON e.designation_id = ds.designation_id
+WHERE d.department_name = 'Finance';
+
+
+-- Q23
+-- Find the highest-paid employee in each department.
+SELECT
+    d.department_name,
+    e.first_name || ' ' || e.last_name AS employee_name,
+    e.salary
+FROM employee e
+JOIN department d
+    ON e.department_id = d.department_id
+WHERE e.salary = (
+    SELECT MAX(e2.salary)
+    FROM employee e2
+    WHERE e2.department_id = e.department_id
+)
+ORDER BY e.salary DESC;
+
+
+-- Q24
+-- Find employees who report directly to Amit Sharma.
+SELECT
+    e.first_name,
+    e.last_name,
+    e.salary
+FROM employee e
+JOIN manager m
+    ON e.manager_id = m.manager_id
+WHERE m.first_name = 'Amit'
+  AND m.last_name = 'Sharma';
+
+
+-- Q25
+-- Display each employee and their manager.
+SELECT
+    e.first_name || ' ' || e.last_name AS employee_name,
+    m.first_name || ' ' || m.last_name AS manager_name
+FROM employee e
+JOIN manager m
+    ON e.manager_id = m.manager_id;
+
+
+-- Q26
+-- Count how many employees work under each manager.
+SELECT
+    m.first_name || ' ' || m.last_name AS manager_name,
+    COUNT(e.employee_id) AS team_size
+FROM manager m
+LEFT JOIN employee e
+    ON m.manager_id = e.manager_id
+GROUP BY m.manager_id, m.first_name, m.last_name
+ORDER BY team_size DESC;
+
+
+-- Q27
+-- Find managers who have more than 4 employees.
+SELECT
+    m.first_name || ' ' || m.last_name AS manager_name,
+    COUNT(e.employee_id) AS team_size
+FROM manager m
+JOIN employee e
+    ON m.manager_id = e.manager_id
+GROUP BY m.manager_id, m.first_name, m.last_name
+HAVING COUNT(e.employee_id) > 4;
+
+
+-- Q28
+-- Calculate the average salary of employees under each manager.
+SELECT
+    m.first_name || ' ' || m.last_name AS manager_name,
+    ROUND(AVG(e.salary), 2) AS average_team_salary
+FROM manager m
+JOIN employee e
+    ON m.manager_id = e.manager_id
+GROUP BY m.manager_id, m.first_name, m.last_name
+ORDER BY average_team_salary DESC;
+
+
+-- Q29
+-- Find employees earning more than the average salary of their department.
+SELECT
+    e.first_name || ' ' || e.last_name AS employee_name,
+    d.department_name,
+    e.salary
+FROM employee e
+JOIN department d
+    ON e.department_id = d.department_id
+WHERE e.salary > (
+    SELECT AVG(e2.salary)
+    FROM employee e2
+    WHERE e2.department_id = e.department_id
+)
+ORDER BY d.department_name, e.salary DESC;
+
+
+-- Q30
+-- Generate a department-wise business report with employee count and salary details.
+SELECT
+    d.department_name,
+    COUNT(e.employee_id) AS employee_count,
+    ROUND(AVG(e.salary), 2) AS average_salary,
+    SUM(e.salary) AS total_payroll,
+    MAX(e.salary) AS highest_salary,
+    MIN(e.salary) AS lowest_salary
+FROM department d
+JOIN employee e
+    ON d.department_id = e.department_id
+GROUP BY d.department_id, d.department_name
+ORDER BY total_payroll DESC;
+
+
+
